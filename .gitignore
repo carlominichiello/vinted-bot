@@ -1,0 +1,6 @@
+config**
+**.pyc
+
+.idea
+
+venv
