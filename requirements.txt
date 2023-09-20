@@ -1,0 +1,7 @@
+beautifulsoup4==4.11.1
+discord.py==2.3.2
+pymongo==4.5.0
+PyYAML==6.0
+Requests==2.31.0
+schema==0.7.5
+termcolor==2.3.0

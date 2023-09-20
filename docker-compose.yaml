@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+  vinted-bot:
+    image: vinted-bot
+    container_name: vinted-bot
+    volumes:
+      - "/home/pi/docker/vinted-bot/config:/config"
+    restart: unless-stopped
+    network_mode: host # if using MongoDB Atlas
+  vinted-monitor:
+    image: vinted-monitor
+    container_name: vinted-monitor
+    volumes:
+      - "/home/pi/docker/vinted-bot/config:/config"
+    restart: unless-stopped
+    network_mode: host # if using MongoDB Atlas
+    
+    # you can eventually add a MongoDB container if you want to use a local database

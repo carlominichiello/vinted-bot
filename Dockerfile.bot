@@ -1,0 +1,11 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY src/ src/
+COPY apps/bot.py bot.py
+
+CMD ["python3", "bot.py", "--bot-config", "/config/bot.yaml", "--database-config", "/config/database.yaml", "--scraper-config", "/config/scraper.yaml"]
