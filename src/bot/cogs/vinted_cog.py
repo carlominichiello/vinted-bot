@@ -158,3 +158,26 @@ class VintedCog(Cog):
         await ctx.send(
             f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
         )
+
+    @commands.command()
+    async def set_max_days_offset(self, ctx, days):
+        """
+        Sets the maximum days offset for the bot to send a notification
+        Usage: `set_max_days_offset [days]`
+        """
+        for weburl in self.bot_config["watch"]:
+            if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
+                watch = self.bot_config["watch"]
+                watch[weburl]["max_days_offset"] = days
+                self.bot_config["watch"] = watch
+
+                logger.info(
+                    f"Modified max_days_offset of watch {weburl} to {days}"
+                )
+                await ctx.send(
+                    f"{ctx.author.mention} - **✔️ Successfully updated max_days_offset for {ctx.channel.name}!**"
+                )
+                return
+        await ctx.send(
+            f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
+        )

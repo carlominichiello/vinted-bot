@@ -1,6 +1,7 @@
 import logging
 
 import requests
+import datetime as dt
 
 from src.bot.embeds_builder import EmbedsBuilder
 
@@ -37,6 +38,18 @@ class BotService:
             ):
                 logger.info(
                     f"Rejected item: {json_data['title']} - Favourites too low ({json_data['favourite_count']} < {self.bot_config['watch'][webhook]['min_favourites']})"
+                )
+                return False
+        if "max_days_offset" in self.bot_config["watch"][webhook]:
+            created_at = dt.datetime.fromisoformat(json_data["created_at"])
+            created_at = dt.datetime(
+                created_at.year, created_at.month, created_at.day, hour=created_at.hour, minute=created_at.minute, second=created_at.second
+            )
+            if (dt.datetime.now() - created_at).days > int(
+                self.bot_config["watch"][webhook]["max_days_offset"]
+            ):
+                logger.info(
+                    f"Rejected item: {json_data['title']} - Created too long ago ({(dt.datetime.now() - created_at).days} > {self.bot_config['watch'][webhook]['max_days_offset']})"
                 )
                 return False
         return True

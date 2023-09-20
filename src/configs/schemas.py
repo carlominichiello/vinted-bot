@@ -31,6 +31,11 @@ def validate_watch(value):
                 int(watch_item["min_favourites"])
             except ValueError:
                 raise SchemaError(f"min_favourites should be a int")
+        if "max_days_offset" in watch_item:
+            try:
+                int(watch_item["max_days_offset"])
+            except ValueError:
+                raise SchemaError(f"max_days_offset should be a int")
     return True
 
 
