@@ -71,7 +71,7 @@ class BotService:
                     "components": [
                         {
                             "type": 2,
-                            "label": "Voir l'annonce",
+                            "label": "View on Vinted",
                             "style": 5,
                             "url": json_data["url"],
                         }
