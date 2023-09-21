@@ -116,6 +116,20 @@ class VintedCog(Cog):
         await ctx.send(f"**{body}**")
 
     @commands.command()
+    async def set_logs_channel(self, ctx):
+        """
+        Sets the logs channel to the current channel
+        Usage: `set_logs_channel`
+        """
+        webhook = await ctx.channel.create_webhook(name="Logs")
+        webhook_url = str(webhook.url)
+        self.bot_config["logs_channel"] = webhook_url
+        logger.info(f"Set logs channel to {webhook_url}")
+        await ctx.send(
+            f"{ctx.author.mention} - **✔️ Successfully set logs channel to {ctx.channel.name}!**"
+        )
+
+    @commands.command()
     async def set_min_rating(self, ctx, rating):
         """
         Sets the minimum rating (out of 5) for the bot to send a notification

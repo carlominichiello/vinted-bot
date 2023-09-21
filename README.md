@@ -29,6 +29,7 @@ logs_directory: ./logs
 ```yaml
 log_level: INFO
 logs_directory: ./logs
+logs_channel: <webhook_url> # if you want to log the bot activity in a specific channel (can be created with the $set_logs_channel command)
 token: <discord bot token> 
 command_prefix: $
 watch:
@@ -105,3 +106,4 @@ python monitor.py
 Go to a Discord channel you want to turn into a watch channel and type `$watch_create <url>` (`$` being your prefix). The bot will then send a message to the channel when a new item is posted on Vinted.
 For more information, type `$help` in a Discord channel.
 
+![Bot Image](https://i.imgur.com/chIQxK3.png)

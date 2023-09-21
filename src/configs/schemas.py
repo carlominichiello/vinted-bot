@@ -1,4 +1,4 @@
-from schema import Schema, SchemaError
+from schema import Schema, SchemaError, Or
 
 
 def validate_log_levels(value):
@@ -48,6 +48,7 @@ bot_config_schema = Schema(
         "log_level": validate_log_levels,
         "logs_directory": str,
         "watch": validate_watch,
+        "logs_channel": Or(str, None),
     }
 )
 

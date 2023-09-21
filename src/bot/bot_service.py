@@ -57,14 +57,7 @@ class BotService:
     def send_item(self, json_data, webhook):
         logger.debug(f"Sending item to Discord: wh {webhook} - {json_data}")
         json_data = self.format_item(json_data)
-        res = requests.post(webhook, json=json_data)
-        if res:
-            if res.status_code == 204:
-                logger.info(f"Sent item to Discord: {res.status_code} {res.text}")
-            else:
-                logger.error(
-                    f"Couldn't send item to Discord: {res.status_code} {res.text}"
-                )
+        self.send_data(json_data, webhook)
 
     def format_item(self, json_data):
         embeds = self.embeds_builder.build_embeds(json_data)
@@ -87,20 +80,34 @@ class BotService:
             ],
         }
 
+    def on_start(self, webhooks):
+        n_webhooks = len(webhooks)
+        data = {
+            "username": "Vinted",
+            "avatar_url": "https://asset.brandfetch.io/idQxXNbl4Z/idqVdsLYmE.jpeg",
+            "content": f"️️️🔍 Started searching for items.\n"
+                       f"{n_webhooks} watch{'es' if n_webhooks > 1 else ''} active.",
+        }
+        logs_channel = self.bot_config["logs_channel"]
+        if logs_channel:
+            self.send_data(data, logs_channel)
+
     def on_finish(self):
         data = {
             "username": "Vinted",
             "avatar_url": "https://asset.brandfetch.io/idQxXNbl4Z/idqVdsLYmE.jpeg",
-            "content": f"️️✔️️ Finished searching for items. Next recheck in {self.scraper_config['recheck_interval'] / 60} minutes.",
+            "content": f"️️🏁 Finished searching for items. Next recheck in {self.scraper_config['recheck_interval'] / 60} minutes.",
         }
-        for webhook in self.get_webhooks():
-            res = requests.post(webhook, json=data)
-            if res:
-                if res.status_code == 204:
-                    logger.info(
-                        f"Sent end of search to Discord: {res.status_code} {res.text}"
-                    )
-                else:
-                    logger.error(
-                        f"Couldn't send end of search to Discord: {res.status_code} {res.text}"
-                    )
+        logs_channel = self.bot_config["logs_channel"]
+        if logs_channel:
+            self.send_data(data, logs_channel)
+
+    def send_data(self, data, webhook):
+        res = requests.post(webhook, json=data)
+        if res:
+            if res.status_code == 204:
+                logger.info(f"Sent message to Discord: {res.status_code} {res.text}")
+            else:
+                logger.error(
+                    f"Couldn't send message to Discord: {res.status_code} {res.text}"
+                )

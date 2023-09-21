@@ -16,6 +16,7 @@ class Monitor:
     def run(self, bot_service, database):
         webhooks = bot_service.get_webhooks()
         logger.info(f"Monitoring {len(webhooks)} urls")
+        bot_service.on_start(webhooks)
         for webhook, value in webhooks.items():
             urls = self.get_urls_to_scrape(value)
             posts = []
