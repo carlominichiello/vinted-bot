@@ -55,6 +55,7 @@ logs_directory: ./logs
 request_interval: <seconds between each request>
 recheck_interval: <seconds between each recheck>
 page_limit: <number of pages to scrape>
+cookie: <your vinted cookie>
 ```
 
 ## Running the bot

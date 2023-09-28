@@ -1,8 +1,7 @@
 import logging
+import requests
 import time
 
-from src.datamodels.transformers import (get_item_from_scraping, item_to_json,
-                                         json_items_eq, user_to_json)
 from src.scraping.scraper import Scraper
 
 logger = logging.getLogger("scraper")
@@ -11,7 +10,7 @@ logger = logging.getLogger("scraper")
 class Monitor:
     def __init__(self, config):
         self.config = config
-        self.scraper = Scraper()
+        self.scraper = Scraper(config)
 
     def run(self, bot_service, database):
         webhooks = bot_service.get_webhooks()
@@ -30,12 +29,7 @@ class Monitor:
 
             for catalog_data in new_posts:
                 try:
-                    item_details, user_data = self.scraper.get_post(catalog_data["url"])
-                    item = get_item_from_scraping(catalog_data, item_details, user_data)
-                    user = item.user
-
-                    json_item = item_to_json(item)
-                    json_user = user_to_json(user)
+                    json_item, json_user = self.scraper.get_post(catalog_data['url'])
 
                     logger.debug(f"Item: {json_item}")
                     logger.debug(f"User: {json_user}")
@@ -43,15 +37,16 @@ class Monitor:
                     self.on_data(json_item, database.items, database)
                     self.on_data(json_user, database.users, database)
 
-                    json_item["user"] = json_user
-                    bot_service.process_item(json_item, webhook)
+                    bot_service.process_item(json_item, json_user, webhook)
 
                     logger.debug(
                         f"Sleeping for {self.config['request_interval']} seconds"
                     )
                     time.sleep(self.config["request_interval"])
+
                 except Exception as e:
                     logger.error(f"Error while scraping {catalog_data['url']}: {e}")
+                    bot_service.on_error(e)
 
         bot_service.on_finish()
         logger.info(f"Next recheck in {self.config['recheck_interval']} seconds")
@@ -80,11 +75,11 @@ class Monitor:
     def remove_dupes(self, items, database):
         no_dupes = []
         all_items = list(database.items[1].find({}))
-        all_items_ids = [item["vinted_id"] for item in all_items]
+        all_items_ids = [item["id"] for item in all_items]
         for item in items:
             if item["id"] in all_items_ids:
                 db_item = [
-                    item_ for item_ in all_items if item_["vinted_id"] == item["id"]
+                    item_ for item_ in all_items if item_["id"] == item["id"]
                 ][0]
                 if db_item["price"] != item["total_item_price"]["amount"]:
                     logger.info(
