@@ -185,9 +185,7 @@ class VintedCog(Cog):
                 watch[weburl]["max_days_offset"] = days
                 self.bot_config["watch"] = watch
 
-                logger.info(
-                    f"Modified max_days_offset of watch {weburl} to {days}"
-                )
+                logger.info(f"Modified max_days_offset of watch {weburl} to {days}")
                 await ctx.send(
                     f"{ctx.author.mention} - **✔️ Successfully updated max_days_offset for {ctx.channel.name}!**"
                 )

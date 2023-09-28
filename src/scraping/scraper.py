@@ -4,6 +4,7 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+
 from src.exceptions import AuthenticationError
 
 logger = logging.getLogger("scraper")
@@ -46,12 +47,12 @@ class Scraper:
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
 
-        if 'item' not in json_response:
+        if "item" not in json_response:
             logger.error(f"Error while scraping {url}: {json_response}")
             raise AuthenticationError("Please update your cookie in your config file")
 
-        json_item = json_response['item']
+        json_item = json_response["item"]
 
-        json_user = json_item.pop('user')
-        json_item['user'] = json_user['id']
+        json_user = json_item.pop("user")
+        json_item["user"] = json_user["id"]
         return json_item, json_user

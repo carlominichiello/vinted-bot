@@ -1,6 +1,7 @@
 import logging
-import requests
 import time
+
+import requests
 
 from src.scraping.scraper import Scraper
 
@@ -52,9 +53,7 @@ class Monitor:
 
             bot_service.process_item(json_item, json_user, webhook)
 
-            logger.debug(
-                f"Sleeping for {self._config['request_interval']} seconds"
-            )
+            logger.debug(f"Sleeping for {self._config['request_interval']} seconds")
             time.sleep(self._config["request_interval"])
 
         except Exception as e:
@@ -108,5 +107,7 @@ class Monitor:
         item_price = item["total_item_price"]["amount"]
         db_item_price = db_item["total_item_price"]
         if item_price != db_item_price:
-            logger.info(f"Item {item['title']} has a new price: {item_price}€ instead of {db_item_price}€")
+            logger.info(
+                f"Item {item['title']} has a new price: {item_price}€ instead of {db_item_price}€"
+            )
         return item_price == db_item_price

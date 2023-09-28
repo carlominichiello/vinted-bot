@@ -1,4 +1,4 @@
-from schema import Schema, SchemaError, Or
+from schema import Or, Schema, SchemaError
 
 
 def _validate_log_levels(value):

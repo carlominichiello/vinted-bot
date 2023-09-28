@@ -1,10 +1,10 @@
+import datetime as dt
 import logging
 
 import requests
-import datetime as dt
 
-from src.bot.embeds_builder import EmbedBuilder
 import src.utils as utils
+from src.bot.embeds_builder import EmbedBuilder
 
 logger = logging.getLogger("bot")
 
@@ -34,9 +34,7 @@ class BotService:
     def _validate_min_rating(self, json_item, json_user, webhook):
         if "min_rating" in self.bot_config["watch"][webhook]:
             user_rating = utils.get_feedback_out_of_5(json_user)
-            if user_rating < float(
-                self.bot_config["watch"][webhook]["min_rating"]
-            ):
+            if user_rating < float(self.bot_config["watch"][webhook]["min_rating"]):
                 logger.info(
                     f"Rejected item: {json_item['title']} - User rating too low ({user_rating} < {self.bot_config['watch'][webhook]['min_rating']})"
                 )
@@ -44,9 +42,9 @@ class BotService:
         return True
 
     def _validate_min_favourites(self, json_item, webhook):
-        if "min_favourites" in self.bot_config["watch"][webhook] and json_item["favourite_count"] < int(
-                self.bot_config["watch"][webhook]["min_favourites"]
-        ):
+        if "min_favourites" in self.bot_config["watch"][webhook] and json_item[
+            "favourite_count"
+        ] < int(self.bot_config["watch"][webhook]["min_favourites"]):
             logger.info(
                 f"Rejected item: {json_item['title']} - Favourites too low ({json_item['favourite_count']} < {self.bot_config['watch'][webhook]['min_favourites']})"
             )
@@ -57,7 +55,12 @@ class BotService:
         if "max_days_offset" in self.bot_config["watch"][webhook]:
             created_at = dt.datetime.fromisoformat(json_item["created_at_ts"])
             created_at = dt.datetime(
-                created_at.year, created_at.month, created_at.day, hour=created_at.hour, minute=created_at.minute, second=created_at.second
+                created_at.year,
+                created_at.month,
+                created_at.day,
+                hour=created_at.hour,
+                minute=created_at.minute,
+                second=created_at.second,
             )
             if (dt.datetime.now() - created_at).days > int(
                 self.bot_config["watch"][webhook]["max_days_offset"]
@@ -96,7 +99,7 @@ class BotService:
         n_webhooks = len(webhooks)
         data = {
             "content": f"️️️🔍 Started searching for items.\n"
-                       f"{n_webhooks} watch{'es' if n_webhooks > 1 else ''} active.",
+            f"{n_webhooks} watch{'es' if n_webhooks > 1 else ''} active.",
         }
         logs_channel = self.bot_config["logs_channel"]
         if logs_channel:

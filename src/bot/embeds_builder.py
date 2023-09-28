@@ -1,4 +1,5 @@
 import datetime as dt
+
 import src.utils as utils
 
 
@@ -90,7 +91,11 @@ class EmbedBuilder:
 
     def _add_seller_field(self, embed, json_user):
         embed["fields"].append(
-            {"name": "**``👤`` Seller**", "value": f"**{self.get_embed_value(json_user, 'login')}**", "inline": True}
+            {
+                "name": "**``👤`` Seller**",
+                "value": f"**{self.get_embed_value(json_user, 'login')}**",
+                "inline": True,
+            }
         )
 
     def _add_favourites_field(self, embed, json_item):
