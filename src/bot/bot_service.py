@@ -3,7 +3,7 @@ import logging
 import requests
 import datetime as dt
 
-from src.bot.embeds_builder import EmbedsBuilder
+from src.bot.embeds_builder import EmbedBuilder
 import src.utils as utils
 
 logger = logging.getLogger("bot")
@@ -15,7 +15,7 @@ class BotService:
         self.database_config = database_config
         self.scraper_config = scraper_config
 
-        self.embeds_builder = EmbedsBuilder(bot_config)
+        self.embeds_builder = EmbedBuilder(bot_config)
 
     def get_webhooks(self):
         return self.bot_config["watch"]
@@ -70,11 +70,11 @@ class BotService:
 
     def send_item(self, json_item, json_user, webhook):
         logger.debug(f"Sending item to Discord: wh {webhook} - {json_item}")
-        json_data = self.format_item(json_item, json_user)
+        json_data = self._format_item(json_item, json_user)
         self.send_data(json_data, webhook)
 
-    def format_item(self, json_item, json_user):
-        embeds = self.embeds_builder.build_embeds(json_item, json_user)
+    def _format_item(self, json_item, json_user):
+        embeds = self.embeds_builder.build_embed(json_item, json_user)
         return {
             "embeds": embeds,
             "components": [

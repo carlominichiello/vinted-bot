@@ -1,7 +1,7 @@
 from schema import Schema, SchemaError, Or
 
 
-def validate_log_levels(value):
+def _validate_log_levels(value):
     log_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     if value not in log_levels:
         raise SchemaError(
@@ -10,7 +10,7 @@ def validate_log_levels(value):
     return True
 
 
-def validate_watch(value):
+def _validate_watch(value):
     if not value:
         return True
     if not isinstance(value, dict):
@@ -39,22 +39,22 @@ def validate_watch(value):
     return True
 
 
-app_config_schema = Schema({"log_level": validate_log_levels, "logs_directory": str})
+app_config_schema = Schema({"log_level": _validate_log_levels, "logs_directory": str})
 
 bot_config_schema = Schema(
     {
         "token": str,
         "command_prefix": str,
-        "log_level": validate_log_levels,
+        "log_level": _validate_log_levels,
         "logs_directory": str,
-        "watch": validate_watch,
+        "watch": _validate_watch,
         "logs_channel": Or(str, None),
     }
 )
 
 scraper_config_schema = Schema(
     {
-        "log_level": validate_log_levels,
+        "log_level": _validate_log_levels,
         "logs_directory": str,
         "request_interval": int,
         "recheck_interval": int,
@@ -65,7 +65,7 @@ scraper_config_schema = Schema(
 
 database_config_schema = Schema(
     {
-        "log_level": validate_log_levels,
+        "log_level": _validate_log_levels,
         "logs_directory": str,
         "connection_string": str,
         "db_name": str,

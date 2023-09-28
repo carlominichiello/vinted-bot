@@ -7,20 +7,20 @@ logger = logging.getLogger("database")
 
 class Database:
     def __init__(self, config):
-        self.config = config
-        self.client = pymongo.MongoClient(self.config["connection_string"])
+        self._config = config
+        self._client = pymongo.MongoClient(self._config["connection_string"])
 
-        self.check_connection()
+        self._check_connection()
 
-        logger.info("Using database: %s", self.config["db_name"])
-        self.db = self.client[self.config["db_name"]]
-        self.items = ("vinted_id", self.db.items)
-        self.users = ("vinted_id", self.db.users)
+        logger.info("Using database: %s", self._config["db_name"])
+        self._db = self._client[self._config["db_name"]]
+        self.items = ("id", self._db.items)
+        self.users = ("id", self._db.users)
 
-    def check_connection(self):
+    def _check_connection(self):
         logger.info("Checking connection to the database")
         try:
-            self.client.server_info()
+            self._client.server_info()
         except pymongo.errors.ServerSelectionTimeoutError:
             logger.error("Couldn't connect to the database")
             raise ConnectionError
@@ -56,5 +56,5 @@ class Database:
 
     def reset(self):
         logger.debug("Resetting database")
-        self.db.items.drop()
-        self.db.users.drop()
+        self._db.items.drop()
+        self._db.users.drop()

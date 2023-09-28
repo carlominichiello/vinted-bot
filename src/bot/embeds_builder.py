@@ -2,28 +2,28 @@ import datetime as dt
 import src.utils as utils
 
 
-class EmbedsBuilder:
+class EmbedBuilder:
     def __init__(self, config):
-        self.config = config
-        self.text_color = 16777215
+        self._config = config
+        self._text_color = 16777215
 
-    def build_embeds(self, json_item, json_user):
-        embed = self.build_base_embed(json_item)
-        self.add_price_field(embed, json_item)
-        self.add_size_field(embed, json_item)
+    def build_embed(self, json_item, json_user):
+        embed = self._build_base_embed(json_item)
+        self._add_price_field(embed, json_item)
+        self._add_size_field(embed, json_item)
         self.add_brand_field(embed, json_item)
-        self.add_feedback_field(embed, json_user)
-        self.add_location_field(embed, json_user)
-        self.add_seller_field(embed, json_user)
-        self.add_favourites_field(embed, json_item)
-        self.add_created_at_field(embed, json_item)
+        self._add_feedback_field(embed, json_user)
+        self._add_location_field(embed, json_user)
+        self._add_seller_field(embed, json_user)
+        self._add_favourites_field(embed, json_item)
+        self._add_created_at_field(embed, json_item)
         return [embed]
 
-    def build_base_embed(self, json_item):
+    def _build_base_embed(self, json_item):
         embed = {
             "description": f"```\n{json_item['description']}```",
             "title": f"``👕`` **__{json_item['title']}__**",
-            "color": self.text_color,
+            "color": self._text_color,
             "url": json_item["url"],
             "fields": [],
             "image": {"url": json_item["photos"][0]["url"]},
@@ -35,7 +35,7 @@ class EmbedsBuilder:
             return f"{json_data[key]}"
         return "Unknown"
 
-    def add_price_field(self, embed, json_item):
+    def _add_price_field(self, embed, json_item):
         embed["fields"].append(
             {
                 "name": "**``💶`` Price**",
@@ -44,7 +44,7 @@ class EmbedsBuilder:
             }
         )
 
-    def add_size_field(self, embed, json_item):
+    def _add_size_field(self, embed, json_item):
         embed["fields"].append(
             {
                 "name": "**``📏`` Size**",
@@ -62,7 +62,7 @@ class EmbedsBuilder:
             }
         )
 
-    def add_feedback_field(self, embed, json_user):
+    def _add_feedback_field(self, embed, json_user):
         positive_feedback_count = json_user["positive_feedback_count"]
         negative_feedback_count = json_user["negative_feedback_count"]
         neutral_feedback_count = json_user["neutral_feedback_count"]
@@ -76,7 +76,7 @@ class EmbedsBuilder:
             }
         )
 
-    def add_location_field(self, embed, json_user):
+    def _add_location_field(self, embed, json_user):
         city = self.get_embed_value(json_user, "city")
         country = self.get_embed_value(json_user, "country_title")
 
@@ -88,12 +88,12 @@ class EmbedsBuilder:
             }
         )
 
-    def add_seller_field(self, embed, json_user):
+    def _add_seller_field(self, embed, json_user):
         embed["fields"].append(
             {"name": "**``👤`` Seller**", "value": f"**{self.get_embed_value(json_user, 'login')}**", "inline": True}
         )
 
-    def add_favourites_field(self, embed, json_item):
+    def _add_favourites_field(self, embed, json_item):
         embed["fields"].append(
             {
                 "name": "**``❤️`` Favourites**",
@@ -102,7 +102,7 @@ class EmbedsBuilder:
             }
         )
 
-    def add_created_at_field(self, embed, json_item):
+    def _add_created_at_field(self, embed, json_item):
         created_at = dt.datetime.fromisoformat(json_item["created_at_ts"]).strftime(
             "%d/%m/%Y %H:%M:%S"
         )
