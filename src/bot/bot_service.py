@@ -18,7 +18,15 @@ class BotService:
         self.embeds_builder = EmbedBuilder(bot_config)
 
     def get_webhooks(self):
-        return self.bot_config["watch"]
+        all_webhooks = self.bot_config["watch"]
+        return {webhook: value for webhook, value in all_webhooks.items() if not 'random_scraping' in value}
+
+    def get_random_scraping_webhook(self):
+        webhooks = self.bot_config["watch"]
+        for webhook, value in webhooks.items():
+            if 'random_scraping' in value:
+                return webhook
+        return None
 
     def process_item(self, json_item, json_user, webhook):
         if self.validate_item(json_item, json_user, webhook):
@@ -29,6 +37,8 @@ class BotService:
             self._validate_min_rating(json_item, json_user, webhook)
             and self._validate_min_favourites(json_item, webhook)
             and self._validate_max_days_offset(json_item, webhook)
+            and self._validate_min_views(json_item, webhook)
+            and self._validate_min_favourites_views_ratio(json_item, webhook)
         )
 
     def _validate_min_rating(self, json_item, json_user, webhook):
@@ -71,6 +81,29 @@ class BotService:
                     f"Rejected item: {json_item['title']} - "
                     f"Created too long ago ({(dt.datetime.now() - created_at).days} > "
                     f"{self.bot_config['watch'][webhook]['max_days_offset']})"
+                )
+                return False
+        return True
+
+    def _validate_min_views(self, json_item, webhook):
+        if "min_views" in self.bot_config["watch"][webhook]:
+            if json_item["view_count"] < int(self.bot_config["watch"][webhook]["min_views"]):
+                logger.info(
+                    f"Rejected item: {json_item['title']} - "
+                    f"Too low views ({json_item['view_count']} < {self.bot_config['watch'][webhook]['min_views']})"
+                )
+                return False
+        return True
+
+    def _validate_min_favourites_views_ratio(self, json_item, webhook):
+        if "min_fv_ratio" in self.bot_config["watch"][webhook]:
+            if json_item["favourite_count"] / json_item["view_count"] < float(
+                self.bot_config["watch"][webhook]["min_fv_ratio"]
+            ):
+                logger.info(
+                    f"Rejected item: {json_item['title']} - "
+                    f"Too low favourites/views ratio ({json_item['favourite_count'] / json_item['view_count']} < "
+                    f"{self.bot_config['watch'][webhook]['min_fv_ratio']})"
                 )
                 return False
         return True

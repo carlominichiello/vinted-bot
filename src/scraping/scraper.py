@@ -1,25 +1,24 @@
 import logging
-import threading
-import time
 from src.scraping.cookies_manager import CookiesManager
 
 import requests
+import time
 
 logger = logging.getLogger("scraper")
 
 
 class Scraper:
-    def __init__(self):
+    def __init__(self, config):
         self._headers = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0",
             "Connection": "keep-alive",
         }
         self._cookies_manager = CookiesManager(self._headers)
-        self._random_scraping = False
+        self._config = config
 
     def scrape_items(self,
                      start_page=1,
-                     end_page=1,
+                     end_page=None,
                      catalog_ids=None,
                      color_ids=None,
                      brand_ids=None,
@@ -32,29 +31,30 @@ class Scraper:
                      price_to=None,
                      order="relevance",
                         ):
-        logger.info(f"Scraping posts from query")
-
         base_url = "https://www.vinted.fr/api/v2/catalog/items"
         query_params = {
             "page": start_page,
-            "catalog_ids": catalog_ids,
-            "color_ids": color_ids,
-            "brand_ids": brand_ids,
-            "size_ids": size_ids,
-            "material_ids": material_ids,
-            "video_game_rating_ids": video_game_rating_ids,
-            "status_ids": status_ids,
+            "catalog_ids[]": catalog_ids,
+            "color_ids[]": color_ids,
+            "brand_ids[]": brand_ids,
+            "size_ids[]": size_ids,
+            "material_ids[]": material_ids,
+            "video_game_rating_ids[]": video_game_rating_ids,
+            "status_ids[]": status_ids,
             "currency": currency,
             "price_from": price_from,
             "price_to": price_to,
             "order": order,
         }
+        logger.info(f"Scraping items with params: {query_params}")
 
         items_ids = []
 
         scrape_all = False
         if end_page == -1:
             scrape_all = True
+        if end_page is None:
+            end_page = start_page
 
         while query_params['page'] <= end_page or scrape_all:
             response = requests.get(base_url, params=query_params, headers=self._headers)
@@ -70,6 +70,7 @@ class Scraper:
                 break
 
             query_params["page"] = current_page + 1
+            time.sleep(self._config['request_interval'])
         return items_ids
 
     def scrape_item(self, item_id):
@@ -96,19 +97,3 @@ class Scraper:
 
         json_user = json_response["user"]
         return json_user
-
-    def start_random_scrape_thread(self):
-        self._random_scrape_thread = threading.Thread(
-            target=self._random_scrape, daemon=True
-        )
-        self._random_scrape_thread.start()
-        self._random_scraping = True
-
-    def stop_random_scrape_thread(self):
-        self._random_scraping = False
-
-    def _random_scrape(self):
-        print("Random scrape started")
-        while self._random_scraping:
-            print("Random scrape")
-            time.sleep(1)

@@ -48,6 +48,9 @@ class VintedCog(Cog):
         new_watch = {}
         new_watch["url"] = vintedurl
         new_watch["channel"] = str(ctx.channel.name)
+        print(vintedurl)
+        if vintedurl == 'random':
+            new_watch["random_scraping"] = True
 
         watch = self.bot_config["watch"]
         watch[webhook_url] = new_watch
@@ -195,3 +198,71 @@ class VintedCog(Cog):
         await ctx.send(
             f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
         )
+
+    @commands.command()
+    async def set_min_views(self, ctx, views):
+        """
+        Sets the minimum views for the bot to send a notification
+        Usage: `set_min_views [views]`
+        """
+        for weburl in self.bot_config["watch"]:
+            if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
+                watch = self.bot_config["watch"]
+                watch[weburl]["min_views"] = views
+                self.bot_config["watch"] = watch
+
+                logger.info(f"Modified min_views of watch {weburl} to {views}")
+                await ctx.send(
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated min_views for {ctx.channel.name}!**"
+                )
+                return
+        await ctx.send(
+            f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
+        )
+
+    @commands.command()
+    async def set_min_fv_ratio(self, ctx, ratio):
+        """
+        Sets the minimum favourites/views ratio for the bot to send a notification
+        Usage: `set_min_fv_ratio [ratio]`
+        """
+        for weburl in self.bot_config["watch"]:
+            if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
+                watch = self.bot_config["watch"]
+                watch[weburl]["min_fv_ratio"] = ratio
+                self.bot_config["watch"] = watch
+
+                logger.info(f"Modified min_fv_ratio of watch {weburl} to {ratio}")
+                await ctx.send(
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated min_fv_ratio for {ctx.channel.name}!**"
+                )
+                return
+        await ctx.send(
+            f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
+        )
+
+    @commands.command()
+    async def enable_random_scraping(self, ctx):
+        """
+        Enables random scraping in the current channel
+        Usage: `enable_random_scraping`
+        """
+        for weburl in self.bot_config["watch"]:
+            if 'random_scraping' in self.bot_config["watch"][weburl]:
+                watch = self.bot_config["watch"]
+                watch[weburl].pop("random_scraping")
+                self.bot_config["watch"] = watch
+
+            if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
+                watch = self.bot_config["watch"]
+                watch[weburl]["random_scraping"] = True
+                self.bot_config["watch"] = watch
+
+                logger.info(f"Enabled random scraping for watch {weburl}")
+                await ctx.send(
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully enabled random scraping for {ctx.channel.name}!**"
+                )
+                return

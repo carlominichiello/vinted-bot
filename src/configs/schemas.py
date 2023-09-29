@@ -36,6 +36,16 @@ def _validate_watch(value):
                 int(watch_item["max_days_offset"])
             except ValueError:
                 raise SchemaError("max_days_offset should be a int")
+        if "min_views" in watch_item:
+            try:
+                int(watch_item["min_views"])
+            except ValueError:
+                raise SchemaError("min_views should be a int")
+        if "min_fv_ratio" in watch_item:
+            try:
+                float(watch_item["min_fv_ratio"])
+            except ValueError:
+                raise SchemaError("min_fv_ratio should be a float")
     return True
 
 
@@ -49,6 +59,7 @@ bot_config_schema = Schema(
         "logs_directory": str,
         "watch": _validate_watch,
         "logs_channel": Or(str, None),
+        "random_scraping_webhook": Or(dict, None),
     }
 )
 

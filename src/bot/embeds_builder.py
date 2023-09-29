@@ -16,6 +16,7 @@ class EmbedBuilder:
         self._add_feedback_field(embed, json_user)
         self._add_location_field(embed, json_user)
         self._add_seller_field(embed, json_user)
+        self._add_views_field(embed, json_item)
         self._add_favourites_field(embed, json_item)
         self._add_created_at_field(embed, json_item)
         return [embed]
@@ -95,6 +96,15 @@ class EmbedBuilder:
             {
                 "name": "**``👤`` Seller**",
                 "value": f"**{self.get_embed_value(json_user, 'login')}**",
+                "inline": True,
+            }
+        )
+
+    def _add_views_field(self, embed, json_item):
+        embed["fields"].append(
+            {
+                "name": "**``👀`` Views**",
+                "value": f"**{self.get_embed_value(json_item, 'view_count')}**",
                 "inline": True,
             }
         )

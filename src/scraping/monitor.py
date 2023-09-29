@@ -1,5 +1,6 @@
 import logging
 import time
+import threading
 
 from src.scraping.scraper import Scraper
 from src.scraping.query_generator import QueryGenerator
@@ -10,8 +11,9 @@ logger = logging.getLogger("scraper")
 class Monitor:
     def __init__(self, config):
         self._config = config
-        self._scraper = Scraper()
+        self._scraper = Scraper(config)
         self._query_generator = QueryGenerator()
+        self._random_scraping = False
 
     def run(self, bot_service, database):
         webhooks = bot_service.get_webhooks()
@@ -23,16 +25,18 @@ class Monitor:
 
         bot_service.on_finish()
         logger.info(f"Next recheck in {self._config['recheck_interval']} seconds")
-        self._wait()
+        self._wait(bot_service, database)
 
-    def _wait(self):
-        self._scraper.start_random_scrape_thread()
+    def _wait(self, bot_service, database):
+        webhook = bot_service.get_random_scraping_webhook()
+        self._start_random_scrape_thread(webhook, bot_service, database) if webhook else None
+
         time_start = time.time()
         while True:
             time.sleep(1)
             if time.time() - time_start > self._config["recheck_interval"]:
                 break
-        self._scraper.stop_random_scrape_thread()
+        self._stop_random_scrape_thread() if webhook else None
 
     def _process_webhook(self, webhook, value, bot_service, database):
         params = self._query_generator.get_query(value["url"])
@@ -80,3 +84,21 @@ class Monitor:
         db_items = list(database.items[1].find({}))
         db_items_ids = [item['id'] for item in db_items]
         return [item_id for item_id in items_ids if item_id not in db_items_ids]
+
+    def _start_random_scrape_thread(self, webhook, bot_service, database):
+        self._random_scraping = True
+        self._random_scrape_thread = threading.Thread(target=self._random_scrape, args=(webhook, bot_service, database))
+        self._random_scrape_thread.start()
+
+    def _stop_random_scrape_thread(self):
+        self._random_scraping = False
+
+    def _random_scrape(self, webhook, bot_service, database):
+        logger.info("Starting random scraping")
+        catalogs_ids = [1904, 5]
+        start_page = 1
+        while self._random_scraping:
+            items = self._scraper.scrape_items(catalog_ids=catalogs_ids, start_page=start_page)
+            start_page += 1
+            for item_id in items:
+                self._process_item(item_id, webhook, bot_service, database)
