@@ -23,7 +23,9 @@ class Scraper:
     def renew_cookies(self):
         logger.info("Renewing cookies")
         response = requests.get("https://www.vinted.fr", headers=self._headers)
-        cookies = "; ".join([f"{cookie.name}={cookie.value}" for cookie in response.cookies])
+        cookies = "; ".join(
+            [f"{cookie.name}={cookie.value}" for cookie in response.cookies]
+        )
         self._headers["Cookie"] = cookies
 
     def _get_soup(self, url):
@@ -66,7 +68,9 @@ class Scraper:
         return json_item, json_user
 
     def _start_cookie_renewal_thread(self):
-        renewal_thread = threading.Thread(target=self._periodic_cookie_renewal, daemon=True)
+        renewal_thread = threading.Thread(
+            target=self._periodic_cookie_renewal, daemon=True
+        )
         renewal_thread.start()
 
     def _periodic_cookie_renewal(self):

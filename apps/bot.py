@@ -2,8 +2,11 @@ import argparse
 
 from src import DiscordBot
 from src.configs.config import Config
-from src.configs.schemas import (bot_config_schema, database_config_schema,
-                                 scraper_config_schema)
+from src.configs.schemas import (
+    bot_config_schema,
+    database_config_schema,
+    scraper_config_schema,
+)
 from src.logger.logger import setup as setup_logger
 
 

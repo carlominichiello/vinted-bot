@@ -1,7 +1,15 @@
 import argparse
 
-from src import (BotService, Config, Database, Monitor, bot_config_schema,
-                 database_config_schema, scraper_config_schema, setup_logger)
+from src import (
+    BotService,
+    Config,
+    Database,
+    Monitor,
+    bot_config_schema,
+    database_config_schema,
+    scraper_config_schema,
+    setup_logger,
+)
 
 
 def parse_arguments():
