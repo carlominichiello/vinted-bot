@@ -193,24 +193,3 @@ class VintedCog(Cog):
         await ctx.send(
             f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
         )
-
-    @commands.command()
-    async def set_cookie(self, ctx, cookie):
-        """
-        Sets the cookie for the bot to use
-        Usage: `set_cookie [cookie]`
-        """
-        for weburl in self.bot_config["watch"]:
-            if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
-                watch = self.bot_config["watch"]
-                watch[weburl]["cookie"] = cookie
-                self.bot_config["watch"] = watch
-
-                logger.info(f"Modified cookie of watch {weburl} to {cookie}")
-                await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully updated cookie for {ctx.channel.name}!**"
-                )
-                return
-        await ctx.send(
-            f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
-        )
