@@ -59,7 +59,6 @@ bot_config_schema = Schema(
         "logs_directory": str,
         "watch": _validate_watch,
         "logs_channel": Or(str, None),
-        "random_scraping_webhook": Or(dict, None),
     }
 )
 
