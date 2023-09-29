@@ -59,7 +59,6 @@ scraper_config_schema = Schema(
         "request_interval": int,
         "recheck_interval": int,
         "page_limit": int,
-        "cookie": str,
     }
 )
 

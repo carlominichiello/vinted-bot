@@ -11,7 +11,7 @@ logger = logging.getLogger("scraper")
 class Monitor:
     def __init__(self, config):
         self._config = config
-        self._scraper = Scraper(config)
+        self._scraper = Scraper()
 
     def run(self, bot_service, database):
         webhooks = bot_service.get_webhooks()
@@ -19,6 +19,7 @@ class Monitor:
         bot_service.on_start(webhooks)
 
         for webhook, value in webhooks.items():
+            self._scraper.renew_cookies()
             self._process_webhook(webhook, value, bot_service, database)
 
         bot_service.on_finish()
