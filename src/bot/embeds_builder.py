@@ -72,7 +72,8 @@ class EmbedBuilder:
         embed["fields"].append(
             {
                 "name": "**``👍``/``👎`` Feedback**",
-                "value": f"**{positive_feedback_count}/{negative_feedback_count} ({neutral_feedback_count} neutral) ({feedback_out_of_5:.2f}/5)**",
+                "value": f"**{positive_feedback_count}/{negative_feedback_count} ({neutral_feedback_count} neutral) "
+                         f"({feedback_out_of_5:.2f}/5)**",
                 "inline": True,
             }
         )

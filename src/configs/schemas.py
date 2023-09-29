@@ -25,17 +25,17 @@ def _validate_watch(value):
             try:
                 float(watch_item["min_rating"])
             except ValueError:
-                raise SchemaError(f"min_rating should be a float")
+                raise SchemaError("min_rating should be a float")
         if "min_favourites" in watch_item:
             try:
                 int(watch_item["min_favourites"])
             except ValueError:
-                raise SchemaError(f"min_favourites should be a int")
+                raise SchemaError("min_favourites should be a int")
         if "max_days_offset" in watch_item:
             try:
                 int(watch_item["max_days_offset"])
             except ValueError:
-                raise SchemaError(f"max_days_offset should be a int")
+                raise SchemaError("max_days_offset should be a int")
     return True
 
 

@@ -41,7 +41,7 @@ class HelpCog(Cog):
             try:
                 owner = ctx.guild.get_member(owner).mention
 
-            except AttributeError as e:
+            except AttributeError:
                 owner = owner
 
             emb = discord.Embed(

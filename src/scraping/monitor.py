@@ -1,8 +1,6 @@
 import logging
 import time
 
-import requests
-
 from src.scraping.scraper import Scraper
 
 logger = logging.getLogger("scraper")

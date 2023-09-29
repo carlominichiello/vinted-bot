@@ -36,7 +36,8 @@ class BotService:
             user_rating = utils.get_feedback_out_of_5(json_user)
             if user_rating < float(self.bot_config["watch"][webhook]["min_rating"]):
                 logger.info(
-                    f"Rejected item: {json_item['title']} - User rating too low ({user_rating} < {self.bot_config['watch'][webhook]['min_rating']})"
+                    f"Rejected item: {json_item['title']} - "
+                    f"User rating too low ({user_rating} < {self.bot_config['watch'][webhook]['min_rating']})"
                 )
                 return False
         return True
@@ -46,7 +47,8 @@ class BotService:
             "favourite_count"
         ] < int(self.bot_config["watch"][webhook]["min_favourites"]):
             logger.info(
-                f"Rejected item: {json_item['title']} - Favourites too low ({json_item['favourite_count']} < {self.bot_config['watch'][webhook]['min_favourites']})"
+                f"Rejected item: {json_item['title']} - "
+                f"Favourites too low ({json_item['favourite_count']} < {self.bot_config['watch'][webhook]['min_favourites']})"
             )
             return False
         return True
@@ -66,7 +68,9 @@ class BotService:
                 self.bot_config["watch"][webhook]["max_days_offset"]
             ):
                 logger.info(
-                    f"Rejected item: {json_item['title']} - Created too long ago ({(dt.datetime.now() - created_at).days} > {self.bot_config['watch'][webhook]['max_days_offset']})"
+                    f"Rejected item: {json_item['title']} - "
+                    f"Created too long ago ({(dt.datetime.now() - created_at).days} > "
+                    f"{self.bot_config['watch'][webhook]['max_days_offset']})"
                 )
                 return False
         return True
@@ -107,7 +111,8 @@ class BotService:
 
     def on_finish(self):
         data = {
-            "content": f"️️🏁 Finished searching for items. Next recheck in {self.scraper_config['recheck_interval'] / 60} minutes.",
+            "content": f"️️🏁 Finished searching for items. "
+                       f"Next recheck in {self.scraper_config['recheck_interval'] / 60} minutes.",
         }
         logs_channel = self.bot_config["logs_channel"]
         if logs_channel:

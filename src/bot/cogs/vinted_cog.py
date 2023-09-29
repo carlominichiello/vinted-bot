@@ -1,9 +1,5 @@
-import json
 import logging
-import os
 
-import discord
-import yaml
 from discord.ext import commands
 
 from src.bot.cogs.cog import Cog
@@ -25,7 +21,8 @@ class VintedCog(Cog):
         for weburl in self.bot_config["watch"]:
             if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
                 await ctx.send(
-                    f"{ctx.author.mention} - **Watching {self.bot_config['watch'][weburl]['url']}!**"
+                    f"{ctx.author.mention} - "
+                    f"**Watching {self.bot_config['watch'][weburl]['url']}!**"
                 )
                 return
         await ctx.send(f"{ctx.author.mention} - **No existing watch in this channel!**")
@@ -73,7 +70,8 @@ class VintedCog(Cog):
 
                 logger.info(f"Modified url of watch {weburl} to {new_url}")
                 await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully updated watch for {ctx.channel.name}!**"
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated watch for {ctx.channel.name}!**"
                 )
                 return
         await ctx.send(
@@ -94,7 +92,8 @@ class VintedCog(Cog):
 
                 logger.info(f"Deleted watch {weburl}")
                 await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully deleted watch for {ctx.channel.name}!**"
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully deleted watch for {ctx.channel.name}!**"
                 )
                 return
         await ctx.send(
@@ -143,7 +142,8 @@ class VintedCog(Cog):
 
                 logger.info(f"Modified min_rating of watch {weburl} to {rating}")
                 await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully updated min_rating for {ctx.channel.name}!**"
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated min_rating for {ctx.channel.name}!**"
                 )
                 return
         await ctx.send(
@@ -166,7 +166,8 @@ class VintedCog(Cog):
                     f"Modified min_favourites of watch {weburl} to {favourites}"
                 )
                 await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully updated min_favourites for {ctx.channel.name}!**"
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated min_favourites for {ctx.channel.name}!**"
                 )
                 return
         await ctx.send(
@@ -187,7 +188,8 @@ class VintedCog(Cog):
 
                 logger.info(f"Modified max_days_offset of watch {weburl} to {days}")
                 await ctx.send(
-                    f"{ctx.author.mention} - **✔️ Successfully updated max_days_offset for {ctx.channel.name}!**"
+                    f"{ctx.author.mention} - "
+                    f"**✔️ Successfully updated max_days_offset for {ctx.channel.name}!**"
                 )
                 return
         await ctx.send(

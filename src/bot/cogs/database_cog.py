@@ -22,4 +22,4 @@ class DatabaseCog(Cog):
         database = Database(self.database_config)
         database.reset()
         await ctx.send(f"{ctx.author.mention} - **Database cleared!**")
-        database_logger.info(f"Database cleared")
+        database_logger.info("Database cleared")
