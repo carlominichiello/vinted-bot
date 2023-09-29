@@ -26,7 +26,7 @@ class BotService:
         for webhook, value in webhooks.items():
             if 'random_scraping' in value:
                 return webhook, value
-        return None
+        return None, None
 
     def process_item(self, json_item, json_user, webhook):
         if self.validate_item(json_item, json_user, webhook):

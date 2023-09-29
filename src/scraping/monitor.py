@@ -38,9 +38,9 @@ class Monitor:
                 break
         self._stop_random_scrape_thread() if webhook else None
 
-    def _process_webhook(self, webhook, value, bot_service, database, page_start=1, page_end=1):
+    def _process_webhook(self, webhook, value, bot_service, database, page_start=1, page_end=None):
         params = self._query_generator.get_query(value["url"])
-        items_ids = self._scraper.scrape_items(**params)
+        items_ids = self._scraper.scrape_items(**params, start_page=page_start, end_page=page_end)
         new_items_ids = self._remove_dupes(items_ids, database)
         logger.info(f"Found {len(new_items_ids)} new items for {value['url']}")
         for item_id in new_items_ids:
