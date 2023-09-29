@@ -1,14 +1,9 @@
-import json
 import logging
-import re
 import threading
 import time
 from src.scraping.cookies_manager import CookiesManager
 
 import requests
-from bs4 import BeautifulSoup
-
-from src.exceptions import AuthenticationError
 
 logger = logging.getLogger("scraper")
 
