@@ -22,7 +22,17 @@ class Monitor:
 
         bot_service.on_finish()
         logger.info(f"Next recheck in {self._config['recheck_interval']} seconds")
-        time.sleep(self._config["recheck_interval"])
+        self._wait()
+
+    def _wait(self):
+        self._scraper.start_random_scrape_thread()
+        time_start = time.time()
+        while True:
+            time.sleep(1)
+            if time.time() - time_start > self._config["recheck_interval"]:
+                break
+        self._scraper.stop_random_scrape_thread()
+
 
     def _process_webhook(self, webhook, value, bot_service, database):
         new_posts = self._get_new_posts(value, database)
