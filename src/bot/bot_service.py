@@ -25,7 +25,7 @@ class BotService:
         webhooks = self.bot_config["watch"]
         for webhook, value in webhooks.items():
             if 'random_scraping' in value:
-                return webhook
+                return webhook, value
         return None
 
     def process_item(self, json_item, json_user, webhook):
@@ -163,7 +163,7 @@ class BotService:
         res = requests.post(webhook, json=self._format_data(data))
         if res:
             if res.status_code == 204:
-                logger.info(f"Sent message to Discord: {res.status_code} {res.text}")
+                logger.debug(f"Sent message to Discord: {res.status_code} {res.text}")
             else:
                 logger.error(
                     f"Couldn't send message to Discord: {res.status_code} {res.text}"

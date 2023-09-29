@@ -46,7 +46,7 @@ class Scraper:
             "price_to": price_to,
             "order": order,
         }
-        logger.info(f"Scraping items with params: {query_params}")
+        logger.debug(f"Scraping items with params: {query_params}")
 
         items_ids = []
 
@@ -74,7 +74,7 @@ class Scraper:
         return items_ids
 
     def scrape_item(self, item_id):
-        logger.info(f"Scraping item: {item_id}")
+        logger.debug(f"Scraping item: {item_id}")
 
         api_url = f"https://www.vinted.fr/api/v2/items/{item_id}"
 
@@ -88,7 +88,7 @@ class Scraper:
         return json_item, json_user
 
     def scrape_user(self, user_id):
-        logger.info(f"Scraping user: {user_id}")
+        logger.debug(f"Scraping user: {user_id}")
 
         api_url = f"https://www.vinted.fr/api/v2/users/{user_id}"
 

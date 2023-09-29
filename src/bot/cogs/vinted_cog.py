@@ -48,7 +48,6 @@ class VintedCog(Cog):
         new_watch = {}
         new_watch["url"] = vintedurl
         new_watch["channel"] = str(ctx.channel.name)
-        print(vintedurl)
         if vintedurl == 'random':
             new_watch["random_scraping"] = True
 
