@@ -58,3 +58,11 @@ class Database:
         logger.debug("Resetting database")
         self._db.items.drop()
         self._db.users.drop()
+
+    def get_no_dupes(self, collection, ids):
+        no_dupes = []
+        for id in ids:
+            db_item = collection[1].find_one({"id": id})
+            if not db_item:
+                no_dupes.append(id)
+        return no_dupes

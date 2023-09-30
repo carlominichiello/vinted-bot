@@ -41,7 +41,7 @@ class Monitor:
     def _process_webhook(self, webhook, value, bot_service, database, page_start=1, page_end=None):
         params = self._query_generator.get_query(value["url"])
         items_ids = self._scraper.scrape_items(**params, start_page=page_start, end_page=page_end)
-        new_items_ids = self._remove_dupes(items_ids, database)
+        new_items_ids = database.get_no_dupes(database.items, items_ids)
         logger.info(f"Found {len(new_items_ids)} new items for {value['url']}")
         for item_id in new_items_ids:
             self._process_item(item_id, webhook, bot_service, database)
@@ -79,11 +79,6 @@ class Monitor:
     def _on_not_exists(self, json_data, collection, database):
         database.insert(json_data, collection)
         return False
-
-    def _remove_dupes(self, items_ids, database):
-        db_items = list(database.items[1].find({}))
-        db_items_ids = [item['id'] for item in db_items]
-        return [item_id for item_id in items_ids if item_id not in db_items_ids]
 
     def _start_random_scrape_thread(self, webhook, value, bot_service, database):
         self._random_scraping = True
