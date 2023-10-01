@@ -36,10 +36,22 @@ class DiscordBot:
             logger.info("Bot is ready")
             logger.info(f"Bot name: {self.bot.user.name}")
 
+            await self._cleanup()
             await self._setup_cogs()
             await self.bot.change_presence(
                 activity=discord.Game(name="Scraping Vinted")
             )
+
+    async def _cleanup(self):
+        app_channels = [watch["channel"] for watch in self.bot_config["watch"].values()]
+        for channel in self.bot.get_all_channels():
+            if channel.name in app_channels:
+                channel_webhooks = [webhook for webhook, value in self.bot_config["watch"].items() if value["channel"] == channel.name]
+                discord_webhooks = await channel.webhooks()
+                for webhook in discord_webhooks:
+                    if webhook.url not in channel_webhooks:
+                        logger.info(f"Deleting webhook {webhook.url}")
+                        await webhook.delete()
 
     async def _setup_cogs(self):
         for cog in self.cogs:

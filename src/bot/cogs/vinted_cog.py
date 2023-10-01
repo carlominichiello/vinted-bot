@@ -42,14 +42,12 @@ class VintedCog(Cog):
                 )
                 return
 
-        webhook = await ctx.channel.create_webhook(name="Watcher")
+        webhook = await ctx.channel.create_webhook(name="Vinted Bot Watch")
         webhook_url = str(webhook.url)
 
         new_watch = {}
         new_watch["url"] = vintedurl
         new_watch["channel"] = str(ctx.channel.name)
-        if vintedurl == 'random':
-            new_watch["random_scraping"] = True
 
         watch = self.bot_config["watch"]
         watch[webhook_url] = new_watch
