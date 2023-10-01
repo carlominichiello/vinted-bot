@@ -1,8 +1,12 @@
 import logging
+from collections import namedtuple
 
 import pymongo
 
 logger = logging.getLogger("database")
+
+
+Collection = namedtuple("Collection", ["unique_key", "db_collection"])
 
 
 class Database:
@@ -14,8 +18,8 @@ class Database:
 
         logger.info("Using database: %s", self._config["db_name"])
         self._db = self._client[self._config["db_name"]]
-        self.items = ("id", self._db.items)
-        self.users = ("id", self._db.users)
+        self.items = Collection("id", self._db.items)
+        self.users = Collection("id", self._db.users)
 
     def _check_connection(self):
         logger.info("Checking connection to the database")
@@ -40,29 +44,25 @@ class Database:
             logger.debug("Inserting document")
             collection[1].insert_one(data)
 
-    def exists(self, data, collection):
-        unique_key = collection[0]
-        db_collection = collection[1]
-
+    def exists(self, data, collection: Collection):
         logger.debug(f"Checking if document exists in the database: {data}")
-        return db_collection.find_one({unique_key: data[unique_key]}) is not None
+        return collection.db_collection.find_one({collection.unique_key: data[collection.unique_key]})
 
     def update(self, data, collection):
-        unique_key = collection[0]
-        db_collection = collection[1]
-
         logger.debug(f"Updating document in the database: {data}")
-        db_collection.update_one({unique_key: data[unique_key]}, {"$set": data})
+        collection.db_collection.update_one(
+            {collection.unique_key: data[collection.unique_key]}, {"$set": data}, upsert=True
+        )
 
     def reset(self):
         logger.debug("Resetting database")
-        self._db.items.drop()
-        self._db.users.drop()
+        self.items.db_collection.drop()
+        self.users.db_collection.drop()
 
     def get_no_dupes(self, collection, ids):
         no_dupes = []
         for id in ids:
-            db_item = collection[1].find_one({"id": id})
+            db_item = collection.db_collection.find_one({"id": id})
             if not db_item:
                 no_dupes.append(id)
         return no_dupes

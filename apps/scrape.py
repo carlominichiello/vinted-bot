@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
         for item in no_dupes:
             json_item, json_user = scraper.scrape_item(item)
-            database.items[1].insert_one(json_item)
-            database.users[1].insert_one(json_user)
+            database.items.db_collection.insert_one(json_item)
+            database.users.db_collection.insert_one(json_user)
             logger.info(f"Item: {json_item['id']} - {json_item['title']}")
             time.sleep(scraper_config["request_interval"])
