@@ -46,7 +46,7 @@ class Monitor:
             if time.time() - time_start > self._config["recheck_interval"]:
                 break
 
-    def _process_webhook(self, webhook, value, bot_service, database, page_start=1, page_end=None, notify=True):
+    def _process_webhook(self, webhook, value, bot_service, database, page_start=1, page_end=None):
         params = self._query_generator.get_query(value["url"])
 
         items_ids = self._scraper.scrape_items(**params, start_page=page_start, end_page=page_end)
@@ -56,9 +56,9 @@ class Monitor:
         new_items_ids = database.get_no_dupes(database.items, items_ids)
         logger.info(f"Found {len(new_items_ids)} new items for {value['url']}")
         for item_id in new_items_ids:
-            self._process_item(item_id, webhook, bot_service, database, notify)
+            self._process_item(item_id, webhook, bot_service, database)
 
-    def _process_item(self, item_id, webhook, bot_service, database, notify=True):
+    def _process_item(self, item_id, webhook, bot_service, database):
         try:
             json_item, json_user = self._scraper.scrape_item(item_id)
 
@@ -68,8 +68,7 @@ class Monitor:
             self._on_data(json_item, database.items, database)
             self._on_data(json_user, database.users, database)
 
-            if notify:
-                bot_service.process_item(json_item, json_user, webhook)
+            bot_service.process_item(json_item, json_user, webhook)
 
             logger.debug(f"Sleeping for {self._config['request_interval']} seconds")
             time.sleep(self._config["request_interval"])
