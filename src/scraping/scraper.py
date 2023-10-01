@@ -56,7 +56,8 @@ class Scraper:
         if end_page is None:
             end_page = start_page
 
-        while query_params['page'] <= end_page or scrape_all:
+        items = [None]
+        while (query_params['page'] <= end_page or scrape_all) and len(items):
             response = requests.get(base_url, params=query_params, headers=self._headers)
             json_response = response.json()
 
@@ -81,6 +82,10 @@ class Scraper:
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
 
+        if json_response['code'] == 104:
+            logger.warning(f"Item {item_id} not found")
+            raise requests.exceptions.HTTPError(f"Item {item_id} not found")
+
         json_item = json_response["item"]
 
         json_user = json_item.pop("user")
@@ -94,6 +99,10 @@ class Scraper:
 
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
+
+        if json_response['code'] == 104:
+            logger.warning(f"User {user_id} not found")
+            raise requests.exceptions.HTTPError(f"User {user_id} not found")
 
         json_user = json_response["user"]
         return json_user
