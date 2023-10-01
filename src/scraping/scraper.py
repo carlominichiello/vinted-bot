@@ -1,5 +1,6 @@
 import logging
 from src.scraping.cookies_manager import CookiesManager
+from src.exceptions import RetryException
 
 import requests
 import time
@@ -81,10 +82,7 @@ class Scraper:
 
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
-
-        if json_response['code'] == 104:
-            logger.warning(f"Item {item_id} not found")
-            raise requests.exceptions.HTTPError(f"Item {item_id} not found")
+        self._check_code(json_response)
 
         json_item = json_response["item"]
 
@@ -99,10 +97,16 @@ class Scraper:
 
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
-
-        if json_response['code'] == 104:
-            logger.warning(f"User {user_id} not found")
-            raise requests.exceptions.HTTPError(f"User {user_id} not found")
+        self._check_code(json_response)
 
         json_user = json_response["user"]
         return json_user
+
+    def _check_code(self, json_response):
+        if json_response['code'] == 104:
+            logger.warning(f"Content not found")
+            raise requests.exceptions.HTTPError(f"Content not found")
+        if json_response['code'] == 100:
+            logger.warning(f"Cookies expired")
+            self._cookies_manager.renew_cookies()
+            raise RetryException(f"Cookies expired")

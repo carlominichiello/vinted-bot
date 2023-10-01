@@ -28,5 +28,5 @@ class CookiesManager:
 
     def _periodic_cookie_renewal(self):
         while True:
-            threading.Event().wait(60 * 30)  # 30 minutes
+            threading.Event().wait(60 * 10)  # 10 minutes
             self.renew_cookies()

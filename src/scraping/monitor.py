@@ -4,6 +4,7 @@ import threading
 import random
 
 import requests.exceptions
+import src.exceptions
 
 from src.scraping.scraper import Scraper
 from src.scraping.query_generator import QueryGenerator
@@ -73,6 +74,15 @@ class Monitor:
             logger.debug(f"Sleeping for {self._config['request_interval']} seconds")
             time.sleep(self._config["request_interval"])
 
+        except src.exceptions.RetryException as e:
+            logger.error(f"Error while scraping {item_id}, retrying: {e}")
+            bot_service.on_error(e)
+            self._process_item(item_id, webhook, bot_service, database)
+
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"Error while scraping {item_id}: {e}")
+            bot_service.on_error(e)
+        
         except Exception as e:
             logger.error(f"Error while scraping {item_id}: {e}")
             bot_service.on_error(e)
