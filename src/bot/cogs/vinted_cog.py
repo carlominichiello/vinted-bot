@@ -243,25 +243,25 @@ class VintedCog(Cog):
         )
 
     @commands.command()
-    async def enable_random_scraping(self, ctx):
+    async def toggle_background_scraping(self, ctx):
         """
-        Enables random scraping in the current channel
-        Usage: `enable_random_scraping`
+        Toggles background scraping in the current channel
+        Usage: `toggle_background_scraping`
         """
         for weburl in self.bot_config["watch"]:
-            if 'random_scraping' in self.bot_config["watch"][weburl]:
-                watch = self.bot_config["watch"]
-                watch[weburl].pop("random_scraping")
-                self.bot_config["watch"] = watch
-
             if self.bot_config["watch"][weburl]["channel"] == ctx.channel.name:
                 watch = self.bot_config["watch"]
-                watch[weburl]["random_scraping"] = True
+                watch[weburl]["background_scraping"] = not watch[weburl][
+                    "background_scraping"
+                ]
                 self.bot_config["watch"] = watch
 
-                logger.info(f"Enabled random scraping for watch {weburl}")
+                logger.info(f"Toggled background_scraping of watch {weburl}")
                 await ctx.send(
                     f"{ctx.author.mention} - "
-                    f"**✔️ Successfully enabled random scraping for {ctx.channel.name}!**"
+                    f"**✔️ {ctx.channel.name} will now {'not' if watch[weburl]['background_scraping'] else ''} be scraped in the background!**"
                 )
                 return
+        await ctx.send(
+            f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
+        )

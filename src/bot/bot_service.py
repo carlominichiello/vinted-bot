@@ -19,14 +19,11 @@ class BotService:
 
     def get_webhooks(self):
         all_webhooks = self.bot_config["watch"]
-        return {webhook: value for webhook, value in all_webhooks.items() if not 'random_scraping' in value}
+        return {webhook: value for webhook, value in all_webhooks.items() if 'background_scraping' not in value}
 
-    def get_random_scraping_webhook(self):
+    def get_background_scraping_webhooks(self):
         webhooks = self.bot_config["watch"]
-        for webhook, value in webhooks.items():
-            if 'random_scraping' in value:
-                return webhook, value
-        return None, None
+        return {webhook: value for webhook, value in webhooks.items() if 'background_scraping' in value}
 
     def process_item(self, json_item, json_user, webhook):
         if self.validate_item(json_item, json_user, webhook):
