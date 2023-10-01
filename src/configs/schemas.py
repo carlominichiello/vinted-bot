@@ -68,7 +68,6 @@ scraper_config_schema = Schema(
         "logs_directory": str,
         "request_interval": int,
         "recheck_interval": int,
-        "page_limit": int,
     }
 )
 
