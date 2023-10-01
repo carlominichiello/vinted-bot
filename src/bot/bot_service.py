@@ -94,6 +94,8 @@ class BotService:
 
     def _validate_min_favourites_views_ratio(self, json_item, webhook):
         if "min_fv_ratio" in self.bot_config["watch"][webhook]:
+            if json_item["view_count"] == 0:
+                return False
             if json_item["favourite_count"] / json_item["view_count"] < float(
                 self.bot_config["watch"][webhook]["min_fv_ratio"]
             ):
