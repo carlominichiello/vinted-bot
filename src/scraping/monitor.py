@@ -19,12 +19,7 @@ class Monitor:
         self._query_generator = QueryGenerator()
         self._threads = []
 
-    def run(self, bot_service, database):
-        background_scraping_webhooks = bot_service.get_background_scraping_webhooks()
-        for webhook, value in background_scraping_webhooks.items():
-            thread_id = random.randint(0, 100000)
-            self._start_background_scrape_thread(webhook, value, bot_service, database, thread_id)
-
+    def run_watch(self, bot_service, database):
         watch_webhooks = bot_service.get_webhooks()
         logger.info(f"Monitoring {len(watch_webhooks)} urls")
         bot_service.on_start(watch_webhooks)
@@ -39,6 +34,14 @@ class Monitor:
         bot_service.on_finish()
         logger.info(f"Next recheck in {self._config['recheck_interval']} seconds")
         self._wait()
+
+    def run_background_scraping(self, bot_service, database):
+        background_scraping_webhooks = bot_service.get_background_scraping_webhooks()
+        for webhook, value in background_scraping_webhooks.items():
+            thread_id = random.randint(0, 100000)
+            self._start_background_scrape_thread(webhook, value, bot_service, database, thread_id)
+
+
 
     def _wait(self):
         time_start = time.time()
@@ -55,7 +58,7 @@ class Monitor:
             raise requests.exceptions.HTTPError(f"Items not found for {value['url']}")
 
         new_items_ids = database.get_no_dupes(database.items, items_ids)
-        logger.info(f"Found {len(new_items_ids)} new items for {value['url']}")
+        logger.info(f"Found {len(new_items_ids)} new items for {value['url']} (page start: {page_start}, page end: {page_end})")
         for item_id in new_items_ids:
             self._process_item(item_id, webhook, bot_service, database)
 
