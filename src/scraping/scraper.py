@@ -1,6 +1,7 @@
 import logging
 from src.scraping.cookies_manager import CookiesManager
 from src.exceptions import RetryException
+from src.scraping.vinted_codes import VintedCodes
 
 import requests
 import time
@@ -83,7 +84,6 @@ class Scraper:
         response = requests.get(api_url, headers=self._headers)
         json_response = response.json()
         self._check_code(json_response)
-
         json_item = json_response["item"]
 
         json_user = json_item.pop("user")
@@ -103,10 +103,14 @@ class Scraper:
         return json_user
 
     def _check_code(self, json_response):
-        if json_response['code'] == 104:
-            logger.warning(f"Content not found")
-            raise requests.exceptions.HTTPError(f"Content not found")
-        if json_response['code'] == 100:
-            logger.warning(f"Cookies expired")
+        if json_response['code'] == VintedCodes.NOT_FOUND.value:
+            logger.warning(f"Content not found: {json_response}")
+            raise requests.exceptions.HTTPError(f"Content not found: {json_response}")
+        if json_response['code'] == VintedCodes.INVALID_SESSION.value:
+            logger.warning(f"Cookies expired: {json_response}")
             self._cookies_manager.renew_cookies()
-            raise RetryException(f"Cookies expired")
+            raise RetryException(f"Cookies expired: {json_response}")
+        if json_response['code'] == VintedCodes.RATE_LIMIT.value:
+            logger.warning(f"Rate limit exceeded: {json_response}")
+            time.sleep(10)
+            raise RetryException(f"Rate limit exceeded: {json_response}")
