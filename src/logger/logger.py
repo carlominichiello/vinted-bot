@@ -16,7 +16,7 @@ def setup(logger_name, config):
 
     time_color = "cyan"
     formatter = ColoredFormatter(
-        fmt=colored("%(asctime)s", time_color) + " - %(levelname)s - %(message)s",
+        fmt=colored("%(asctime)s", time_color) + " - %(levelname)s - %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
