@@ -18,10 +18,11 @@ class Monitor:
         self._scraper = Scraper(config)
         self._query_generator = QueryGenerator()
         self._threads = []
+        self._background_scrape_monitor_thread_started = False
 
     def run_watch(self, bot_service, database):
         watch_webhooks = bot_service.get_webhooks()
-        logger.info(f"Monitoring {len(watch_webhooks)} urls")
+        logger.info(f"Watching {len(watch_webhooks)} urls")
         bot_service.on_start(watch_webhooks)
 
         for webhook, value in watch_webhooks.items():
@@ -36,20 +37,13 @@ class Monitor:
         self._wait()
 
     def run_background_scraping(self, bot_service, database):
-        background_scraping_webhooks = bot_service.get_background_scraping_webhooks()
-        for webhook, value in background_scraping_webhooks.items():
-            thread_id = random.randint(0, 100000)
-            self._start_background_scrape_thread(value['url'], database, thread_id, webhook, bot_service)
+        self._start_background_scrape_monitor_thread(bot_service, database)
 
     def run_random_scraping(self, bot_service, database):
         self._start_random_scrape_thread(bot_service, database)
 
     def _wait(self):
-        time_start = time.time()
-        while True:
-            time.sleep(1)
-            if time.time() - time_start > self._config["recheck_interval"]:
-                break
+        time.sleep(self._config["recheck_interval"])
 
     def _process_url(self, url, database, page_start=1, page_end=None, webhook=None, bot_service=None):
         params = self._query_generator.get_query(url)
@@ -114,12 +108,31 @@ class Monitor:
         database.insert(json_data, collection)
         return False
 
+    def _start_background_scrape_monitor_thread(self, bot_service, database):
+           self._background_scrape_monitor_thread = threading.Thread(target=self._background_scrape_monitor, args=(bot_service, database))
+           self._background_scrape_monitor_thread.start()
+
+    def _background_scrape_monitor(self, bot_service, database):
+        logger.info(f"Starting background scraping monitor")
+
+        background_scraping_webhooks = {}
+        while True:
+            new_background_scraping_webhooks = bot_service.get_background_scraping_webhooks()
+            if new_background_scraping_webhooks != background_scraping_webhooks:
+                background_scraping_webhooks = new_background_scraping_webhooks
+                for webhook, value in background_scraping_webhooks.items():
+                    thread_id = random.randint(0, 100000)
+                    self._start_background_scrape_thread(value['url'], database, thread_id, webhook, bot_service)
+            self._background_scrape_monitor_thread_started = True
+            self._wait()
+
     def _start_background_scrape_thread(self, url, database, thread_id, webhook=None, bot_service=None):
         self._threads.append(thread_id)
         self._background_scrape_thread = threading.Thread(target=self._background_scrape, args=(url, database, thread_id, webhook, bot_service))
         self._background_scrape_thread.start()
 
     def _stop_background_scrape_thread(self, thread_id):
+        logger.debug(f"Stopping background scraping thread {thread_id}")
         self._threads.remove(thread_id)
 
     def _background_scrape(self, url, database, thread_id, webhook=None, bot_service=None):
@@ -148,9 +161,10 @@ class Monitor:
     def _random_scrape(self, bot_service, database):
         logger.info(f"Starting random scraping")
         while True:
-            while not self._threads:
+            while not self._threads and self._background_scrape_monitor_thread_started:
                 try:
                     url = self._get_random_scrape_url()
+                    logger.info(f"Random scraping {url}")
                     page_start = 1
                     while True:
                         self._process_url(url, database, page_start=page_start, bot_service=bot_service)

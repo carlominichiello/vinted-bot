@@ -50,7 +50,7 @@ class Config:
 
     def _read_config_decorator(func):
         def wrapper(self, *args, **kwargs):
-            self.bot_config = self.load_config()
+            self._config_data = self.load_config()
             return func(self, *args, **kwargs)
 
         return wrapper
