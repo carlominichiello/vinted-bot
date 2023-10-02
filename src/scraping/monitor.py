@@ -123,6 +123,7 @@ class Monitor:
                 for webhook, value in background_scraping_webhooks.items():
                     thread_id = random.randint(0, 100000)
                     self._start_background_scrape_thread(value['url'], database, thread_id, webhook, bot_service)
+                    time.sleep(1)
             self._background_scrape_monitor_thread_started = True
             self._wait()
 

@@ -263,3 +263,29 @@ class VintedCog(Cog):
         await ctx.send(
             f"{ctx.author.mention} - **❌ No existing watch in this channel!**"
         )
+
+    @commands.Cog.listener()
+    async def on_guild_channel_update(self, before, after):
+        if before.name != after.name:
+            for weburl in self.bot_config["watch"]:
+                if self.bot_config["watch"][weburl]["channel"] == before.name:
+                    watch = self.bot_config["watch"]
+                    watch[weburl]["channel"] = after.name
+                    self.bot_config["watch"] = watch
+
+                    logger.info(
+                        f"Modified channel of watch {weburl} from {before.name} to {after.name}"
+
+                    )
+                    return
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+        for weburl in self.bot_config["watch"]:
+            if self.bot_config["watch"][weburl]["channel"] == channel.name:
+                watch = self.bot_config["watch"]
+                del watch[weburl]
+                self.bot_config["watch"] = watch
+
+                logger.info(f"Deleted watch {weburl} from {channel.name}")
+                return
