@@ -139,7 +139,7 @@ class Monitor:
     def _background_scrape(self, url, database, thread_id, webhook=None, bot_service=None):
         logger.info(f"Starting background scraping for {url}")
         logger.debug(f"Thread id: {thread_id}")
-        page_start = 100
+        page_start = 1
         while thread_id in self._threads:
             try:
                 self._process_url(url, database, page_start, webhook=webhook, bot_service=bot_service)

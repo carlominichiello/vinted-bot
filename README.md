@@ -1,6 +1,6 @@
 # vinted-bot
 
-Vinted bot is composed of two applications, a Discord bot, and a scraper, that allows you to get notified when a new item is posted on Vinted.
+Vinted bot is composed of two applications, a Discord bot, and a scraper, that allows you to get notified when a new item is posted on Vinted. The bot can also do background scraping to scrape while waiting for new items and random scraping to scrape random items.
 
 - [Configuration](#configuration)
 - [Running the bot](#running-the-bot)
@@ -37,6 +37,10 @@ watch:
     channel: <channel_name>
     min_favourites: # if you want to be notified only if the item has more than min_favourites favourites
     min_rating: # if you want to be notified only if the seller has more than min_rating rating
+    max_days_offset: # if you want to be notified only if the item has been posted less than max_days_offset days ago
+    min_views: # if you want to be notified only if the item has more than min_views views
+    min_fv_ratio: # if you want to be notified only if the item has more than min_fv_ratio favourites/views ratio
+    background_scraping: # if you want to scrape in background
     url: <url_to_watch>
 ```
 
