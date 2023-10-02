@@ -50,5 +50,6 @@ if __name__ == "__main__":
     bot_service = BotService(bot_config, database_config, scraper_config)
 
     monitor.run_background_scraping(bot_service, database)
+    monitor.run_random_scraping(bot_service, database)
     while True:
         monitor.run_watch(bot_service, database)

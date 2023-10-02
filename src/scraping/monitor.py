@@ -41,8 +41,8 @@ class Monitor:
             thread_id = random.randint(0, 100000)
             self._start_background_scrape_thread(value['url'], database, thread_id, webhook, bot_service)
 
-    def run_random_scraping(self, database):
-        pass
+    def run_random_scraping(self, bot_service, database):
+        self._start_random_scrape_thread(bot_service, database)
 
     def _wait(self):
         time_start = time.time()
@@ -125,15 +125,47 @@ class Monitor:
     def _background_scrape(self, url, database, thread_id, webhook=None, bot_service=None):
         logger.info(f"Starting background scraping for {url}")
         logger.debug(f"Thread id: {thread_id}")
-        page_start = 1
+        page_start = 100
         while thread_id in self._threads:
             try:
                 self._process_url(url, database, page_start, webhook=webhook, bot_service=bot_service)
             except requests.exceptions.HTTPError as e:
                 logger.error(f"Error while scraping {url}: {e}")
 
-                if bot_service:
-                    bot_service.on_error(e)
+                if bot_service and webhook:
+                    data = {
+                        'content': "️️❌ No more items found",
+                    }
+                    bot_service.send_data(data, webhook)
 
                 self._stop_background_scrape_thread(thread_id)
             page_start += 1
+
+    def _start_random_scrape_thread(self, bot_service, database):
+        self._random_scrape_thread = threading.Thread(target=self._random_scrape, args=(bot_service, database))
+        self._random_scrape_thread.start()
+
+    def _random_scrape(self, bot_service, database):
+        logger.info(f"Starting random scraping")
+        while True:
+            while not self._threads:
+                try:
+                    url = self._get_random_scrape_url()
+                    page_start = 1
+                    while True:
+                        self._process_url(url, database, page_start=page_start, bot_service=bot_service)
+                        page_start += 1
+
+                except requests.exceptions.HTTPError as e:
+                    logger.error(f"Error while scraping {url}: {e}")
+
+                    if bot_service:
+                        bot_service.on_error(e)
+            self._wait()
+
+    def _get_random_scrape_url(self):
+        cats = self._scraper.scrape_cats()
+        cats_list = list(cats.keys())
+        random_cat = random.choice(cats_list)
+        url = f"https://www.vinted.fr/catalog?catalog[]={random_cat}"
+        return url

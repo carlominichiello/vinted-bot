@@ -114,3 +114,27 @@ class Scraper:
             logger.warning(f"Rate limit exceeded: {json_response}")
             time.sleep(10)
             raise RetryException(f"Rate limit exceeded: {json_response}")
+
+    def scrape_cats(self):
+        api_url = "https://www.vinted.fr/api/v2/catalogs"
+        response = requests.get(api_url, headers=self._headers)
+        json_response = response.json()
+        self._check_code(json_response)
+
+        catalogs = self._get_all_catalogs(json_response)
+        return catalogs
+
+    def _get_all_catalogs(self, json_item):
+        all_catalogs = {}
+        current_path = []
+
+        for catalog in json_item["catalogs"]:
+            self._get_all_catalogs_recursive(catalog, current_path.copy(), all_catalogs)
+        return all_catalogs
+
+    def _get_all_catalogs_recursive(self, json_item, current_path, all_catalogs):
+        current_path.append(json_item["id"])
+        all_catalogs[json_item["id"]] = current_path
+        for catalog in json_item["catalogs"]:
+            self._get_all_catalogs_recursive(catalog, current_path.copy(), all_catalogs)
+        current_path.pop()
