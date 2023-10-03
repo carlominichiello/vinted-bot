@@ -10,8 +10,9 @@ Collection = namedtuple("Collection", ["unique_key", "db_collection"])
 
 
 class Database:
-    def __init__(self, config):
+    def __init__(self, config, save_to_db=True):
         self._config = config
+        self._save_to_db = save_to_db
         self._client = pymongo.MongoClient(self._config["connection_string"])
 
         self._check_connection()
@@ -34,6 +35,8 @@ class Database:
         logger.info("Successfully connected to the database")
 
     def insert(self, data, collection):
+        if not self._save_to_db:
+            return
         logger.debug("Inserting document into the database: %s", data)
         if self.exists(data, collection):
             logger.debug("Document already exists in the database")
@@ -49,6 +52,8 @@ class Database:
         return collection.db_collection.find_one({collection.unique_key: data[collection.unique_key]})
 
     def update(self, data, collection):
+        if not self._save_to_db:
+            return
         logger.debug(f"Updating document in the database: {data}")
         collection.db_collection.update_one(
             {collection.unique_key: data[collection.unique_key]}, {"$set": data}, upsert=True

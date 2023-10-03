@@ -32,6 +32,11 @@ def parse_arguments():
         default="./config/bot.yaml",
         help="Path to the config file",
     )
+    parser.add_argument(
+        "--save-to-db",
+        action="store_true",
+        help="Save data to database",
+    )
     return parser.parse_args()
 
 
@@ -45,7 +50,7 @@ if __name__ == "__main__":
     setup_logger("database", database_config)
     setup_logger("bot", bot_config)
 
-    database = Database(database_config)
+    database = Database(database_config, args.save_to_db)
     monitor = Monitor(scraper_config)
     bot_service = BotService(bot_config, database_config, scraper_config)
 
