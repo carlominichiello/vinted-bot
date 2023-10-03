@@ -37,6 +37,21 @@ def parse_arguments():
         action="store_true",
         help="Save data to database",
     )
+    parser.add_argument(
+        "--run-random-scraping",
+        action="store_true",
+        help="Run random scraping",
+    )
+    parser.add_argument(
+        "--run-background-scraping",
+        action="store_true",
+        help="Run background scraping",
+    )
+    parser.add_argument(
+        "--run-watch",
+        action="store_true",
+        help="Run watch",
+    )
     return parser.parse_args()
 
 
@@ -54,7 +69,10 @@ if __name__ == "__main__":
     monitor = Monitor(scraper_config)
     bot_service = BotService(bot_config, database_config, scraper_config)
 
-    monitor.run_background_scraping(bot_service, database)
-    monitor.run_random_scraping(bot_service, database)
-    while True:
-        monitor.run_watch(bot_service, database)
+    if args.run_random_scraping:
+        monitor.run_background_scraping(bot_service, database)
+    if args.run_background_scraping:
+        monitor.run_random_scraping(bot_service, database)
+    if args.run_watch:
+        while True:
+            monitor.run_watch(bot_service, database)
