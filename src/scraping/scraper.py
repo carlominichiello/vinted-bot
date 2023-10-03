@@ -62,7 +62,8 @@ class Scraper:
         while (query_params['page'] <= end_page or scrape_all) and len(items):
             response = requests.get(base_url, params=query_params, headers=self._headers)
             json_response = response.json()
-
+            self._check_code(json_response)
+            
             current_page = json_response["pagination"]["current_page"]
             total_pages = json_response["pagination"]["total_pages"]
 
